@@ -7,9 +7,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report
 from sklearn.ensemble import RandomForestClassifier
 
-# =========================
 # (A) RH: triagem de currículos
-# =========================
 cv_texts = [
     "Python, FastAPI, PostgreSQL, 5 anos de experiência em backend",
     "Excel avançado, PowerBI, rotinas financeiras",
@@ -18,9 +16,8 @@ cv_texts = [
     "Atendimento ao cliente, vendas, metas e CRM",
     "SageMaker, MLops, scikit-learn, pipelines de IA",
 ]
-labels = [1,0,0,1,0,1]  # 1=match para vaga de engenheiro de software/IA
+labels = [1,0,0,1,0,1]
 Xtr, Xte, ytr, yte = train_test_split(cv_texts, labels, test_size=0.33, random_state=42)
-pipe = Pipeline := (TfidfVectorizer(), LogisticRegression(max_iter=1000))
 vec = TfidfVectorizer()
 Xtrv, Xtev = vec.fit_transform(Xtr), vec.transform(Xte)
 clf = LogisticRegression(max_iter=1000).fit(Xtrv, ytr)
@@ -28,16 +25,12 @@ pred = clf.predict(Xtev)
 print("[RH] Triagem de CVs — classificação (1=match):")
 print(classification_report(yte, pred))
 
-# =========================
-# (B) Manutenção preditiva (simulação)
-# =========================
-# features: vibração, temperatura, corrente (ruído leve) -> alvo: 1=falha iminente
+# (B) Manutenção preditiva
 rng = np.random.default_rng(42)
 n = 500
 vibr = rng.normal(0.5, 0.15, n)
 temp = rng.normal(60, 5, n)
 corr = rng.normal(10, 1.5, n)
-# regra de falha: vibração>0.65 & temp>63 ou corrente>12 (simplificada)
 y = ((vibr>0.65) & (temp>63)) | (corr>12)
 X = pd.DataFrame({"vibracao":vibr,"temperatura":temp,"corrente":corr})
 Xtr, Xte, ytr, yte = train_test_split(X, y.astype(int), test_size=0.25, random_state=42)

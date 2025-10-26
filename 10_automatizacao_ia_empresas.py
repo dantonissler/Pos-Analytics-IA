@@ -1,11 +1,10 @@
-# Exemplo de “orquestrador” que integra:
-# (1) classificação automática de chamados, (2) regra de priorização, (3) envio para fila.
+from typing import List
+
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
-import queue, time
+import queue
 
-# Base mínima (texto -> categoria)
 dados = [
     ("sistema fora do ar desde cedo", "incidente"),
     ("erro 500 no endpoint de login", "incidente"),
@@ -17,7 +16,6 @@ dados = [
 X, y = zip(*dados)
 pipe = Pipeline([("tfidf", TfidfVectorizer()), ("lr", LogisticRegression(max_iter=1000))]).fit(X, y)
 
-# fila simulada
 fila_incidentes = queue.Queue()
 fila_solicitacoes = queue.Queue()
 
@@ -30,7 +28,7 @@ def priorizar(texto: str) -> dict:
 def enviar_para_fila(item: dict):
     (fila_incidentes if item["categoria"]=="incidente" else fila_solicitacoes).put(item)
 
-def processar_lote(chamados: list[str]):
+def processar_lote(chamados: List[str]):
     for c in chamados:
         item = priorizar(c)
         enviar_para_fila(item)

@@ -1,9 +1,8 @@
 # Chatbot simples com classificação de intenções (TF-IDF + LinearSVC) e fallback semântico.
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.pipeline import Pipeline
 from sklearn.svm import LinearSVC
-from sklearn.metrics.pairwise import cosine_similarity
-import numpy as np
 
 faq_base = [
     ("qual o horário de atendimento?", "horario"),
@@ -18,7 +17,7 @@ X, y = zip(*faq_base)
 
 clf = Pipeline([("tfidf", TfidfVectorizer()), ("svm", LinearSVC())]).fit(X, y)
 tfidf = clf.named_steps["tfidf"]
-X_vec = tfidf.fit_transform(X)  # vetoriza base para fallback semântico
+X_vec = tfidf.fit_transform(X)
 
 RESPOSTAS = {
     "horario": "Nosso atendimento é de seg a sex, das 8h às 18h (horário de Brasília).",
@@ -28,15 +27,15 @@ RESPOSTAS = {
     "_fallback": "Não entendi perfeitamente. Você pode reformular? Posso ajudar com: horário, 2ª via de boleto, reclamações."
 }
 
+
 def responder(msg: str) -> str:
-    # 1) tenta classificar intenção
     intent = clf.predict([msg])[0]
-    # 2) valida confiança via similaridade de cosseno com a base (fallback se muito baixa)
     vec_user = tfidf.transform([msg])
     sim = cosine_similarity(vec_user, X_vec).max()
-    if sim < 0.35:  # limiar simples
+    if sim < 0.35:
         return RESPOSTAS["_fallback"]
     return RESPOSTAS.get(intent, RESPOSTAS["_fallback"])
+
 
 if __name__ == "__main__":
     testes = [

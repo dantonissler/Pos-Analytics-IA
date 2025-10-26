@@ -1,8 +1,8 @@
 # Databricks + Spark ML — Exemplo mínimo
 
-> Este notebook funciona no Databricks (ou local com PySpark). Demonstra leitura de dados, transformação e um pipeline de ML.
+# > Este notebook funciona no Databricks (ou local com PySpark). Demonstra leitura de dados, transformação e um pipeline de ML.
 
-```python
+
 from pyspark.sql import SparkSession
 from pyspark.ml.feature import VectorAssembler, StringIndexer
 from pyspark.ml.classification import RandomForestClassifier
